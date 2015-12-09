@@ -1,0 +1,160 @@
+//Project 9 -Squids, Evelyn
+
+Squid sasuke, hibari, ichigo;
+float surface;
+float shipX=0, shipDX=5;
+float moonX=0, moonY=100;
+
+//// SETUP:  size & reset.
+void setup() {
+  size( 800, 600 );
+  reset();
+}
+// Constuct Purple(s).
+void reset() {
+  surface=  random(  height/4, height/2 );
+  moonY=  surface/3;
+  moonY=  random( 200, surface+200 );
+  // 3 Purples.
+  sasuke=  new Squid( "sasuke", width/4  );
+  hibari=  new Squid( "hibari", width/2 );
+  ichigo=  new Squid( "ichigo", width*3/4 );
+}
+
+
+//// NEXT FRAME:  scene, action
+void draw() {
+  scene();
+  action();
+  show();
+}
+void scene() {
+  background( 50, 150, 200 );      // Dark sky.
+  // Moon
+  if (moonX > width+100) {
+    moonX=  -20;
+    moonY=  random( 250, surface+150 );
+  }
+  moonX += 1;
+  fill( 255,255,224 );
+  ellipse( moonX, moonY-150*sin( PI * moonX/width ), 40, 40 );
+  // Dark water.
+  fill( 0, 100, 150 );
+  rect( 0, surface, width, height-surface );
+}
+void action() {
+  sasuke.move();
+  hibari.move();
+  ichigo.move();
+  if (shipX>width)  shipDX = -random( 0.5, 3 );
+  if (shipX<0)      shipDX = random( 1, 5 );
+  shipX += shipDX;
+}
+void show() {
+  sasuke.show(); 
+  hibari.show(); 
+  ichigo.show(); 
+  // ship.
+  fill(192,192,192);
+  noStroke();
+  rect( shipX, surface-40, 100, 40 );
+  fill(192, 192, 192);
+  ellipse(shipX+50, surface-18,30,30);
+  
+  if (shipDX>0) {   
+    fill(192, 192, 192);
+    triangle( shipX, surface, shipX, surface-40, shipX-40, surface-40 );
+    triangle( shipX+100, surface, shipX+100, surface-40, shipX+140, surface-40 );
+    fill(255,99,71);
+    rect( shipX+25, surface-60, 50, 20 );    
+    fill(255, 100, 50);/// Cabin & mast.
+    rect( shipX+45, surface-80, 10, 20 );
+    // Smoke
+    fill( 105,105,105);
+    ellipse( shipX +40 -10*shipDX, surface-90, 40, 40 );
+    ellipse( shipX +40 -20*shipDX, surface-100, 30, 30 );
+    ellipse( shipX +40 -30*shipDX, surface-110, 20, 20 );
+  } else {
+    fill(192,192,192); 
+    triangle( shipX+100, surface, shipX+100, surface-40, shipX+140, surface-40 );
+    triangle( shipX, surface, shipX, surface-40, shipX-40, surface-40 );
+    fill(255,99,71);
+    rect( shipX+25, surface-60, 50, 20 ); 
+    fill(255, 100, 50);// Cabin & mast.
+    rect( shipX+45, surface-80, 10, 20 );
+    // Smoke
+    fill( 105,105,105 );
+    ellipse( shipX +40 -10*shipDX, surface-90, 40, 40 );
+    ellipse( shipX +40 -20*shipDX, surface-100, 30, 30 );
+    ellipse( shipX +40 -30*shipDX, surface-110, 20, 20 );
+  }
+}
+
+
+//// EVENT HANDLERS:  keys, clicks ////
+void keyPressed() {
+  if (key == 'r') reset();
+}
+
+
+////OBJECTS
+
+class Squid {
+  float x, y;        // Coordinates
+  float dx=0, dy=0;  // Speed
+  float w=30, h=30;
+  int legs=10;      // Number of legs.
+  String name="";
+  float r, g, b;      // Color.
+
+  //// CONSTRUCTORS ////
+  Squid( String s, float x ) {
+    this.name=  s;
+    this.x=x;
+    bsasuke();
+    // Purplish
+    r=  random(100, 255);
+    g=  random(0, 100);
+    b=  random(100, 250);
+  }
+
+  //// Start again at bsasuke.  (Random speed.)
+  void bsasuke() {
+    y=  height - h*2;
+    dy=  -random( 0.1, 0.9 );
+    legs=  int( random(1, 10.9) );
+  }
+
+  //// METHODS:  move & show ////
+  void move() {
+    x += dx;
+    y += dy;
+    if (y<surface) {
+      bsasuke();
+    }
+  }
+
+
+  //// Display the creature.
+  void show() {
+    fill(r, g, b);
+    stroke(r, g, b);
+    ellipse( x, y, w, h );         // round top
+    rect( x-w/2, y, w, h/2 );      // flat bsasuke
+    // Legs
+    fill(r, g, b);                 // legs.
+    float legX=  x-w/2, foot=0;
+    if (dy<0) {
+      foot=5;
+      if (y%50 > 25) foot=  -foot;
+      //--  if (frameCount/30 %  2 > 0) foot=  -foot;
+    }
+    for (int i=0; i<legs; i++) {
+      line( legX, y+h/2, legX+foot, 20+y+h/2 );
+      legX += w / (legs-1);
+    }
+    fill(200, 200, 0);
+    //  text( name+"("+legs+")", x-w/2, y-20 );
+    text( name, x-w/2, y+h/2 );
+  }
+}
